@@ -8,8 +8,8 @@
 </h3>
 
 <h6 align="center"> 
-  <a href="https://raw.githubusercontent.com/boshold/.github/main/profile/assets/pronunciation_bosdev.mp3" target="_blank">/ˈboʊsˌdɛv/</a>
+  <a href="https://gabalpha.github.io/read-audio/?p=https://raw.githubusercontent.com/boshold/.github/main/profile/assets/pronunciation_bosdev.mp4" target="_blank">/ˈboʊsˌdɛv/</a>
   <br/>
-  <a href="https://raw.githubusercontent.com/boshold/.github/main/profile/assets/pronunciation_boshold_development.mp3" target="_blank">/ˈboʊsˌhɔld dɪˈvɛləpmənt/</a>
+  <a href="https://gabalpha.github.io/read-audio/?p=https://raw.githubusercontent.com/boshold/.github/main/profile/assets/pronunciation_boshold_development.mp4" target="_blank">/ˈboʊsˌhɔld dɪˈvɛləpmənt/</a>
 
 </h6>
