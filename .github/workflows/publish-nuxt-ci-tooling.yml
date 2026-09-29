@@ -1,0 +1,31 @@
+name: Publish Nuxt CI tooling
+
+on:
+  push:
+    branches: [main, feat/shared-ci-image]
+    paths:
+      - ci-images/nuxt-filter/Dockerfile
+      - .github/workflows/publish-nuxt-ci-tooling.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    runs-on: ${{ vars.CI_RUNNER_STANDARD || 'blacksmith-2vcpu-ubuntu-2404' }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        id: image
+        with:
+          context: ci-images/nuxt-filter
+          push: true
+          tags: ghcr.io/boshold/nuxt-ci-tooling:playwright-1.63-node-24-pg-18
+      - run: echo "ghcr.io/boshold/nuxt-ci-tooling@${{ steps.image.outputs.digest }}"
