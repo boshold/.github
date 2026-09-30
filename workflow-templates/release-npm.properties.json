@@ -1,0 +1,7 @@
+{
+  "name": "boshold release (npm)",
+  "description": "Manual release: full CI, version bump commit and tag, publish to GitHub Packages, GitHub release. Needs the boshold CI workflow as ci.yml.",
+  "iconName": "octicon package",
+  "categories": ["TypeScript"],
+  "filePatterns": ["package.json$"]
+}

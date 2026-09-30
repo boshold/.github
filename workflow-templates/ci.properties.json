@@ -1,0 +1,7 @@
+{
+  "name": "boshold CI",
+  "description": "Shared Nuxt CI from boshold/gh-actions. A release calls it with full: true.",
+  "iconName": "octicon check-circle",
+  "categories": ["TypeScript"],
+  "filePatterns": ["package.json$"]
+}
