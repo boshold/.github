@@ -1,0 +1,41 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Version part to raise
+        type: choice
+        options: [patch, minor, major]
+        default: patch
+      dry-run:
+        description: Test and build, but push, publish and release nothing
+        type: boolean
+        default: false
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+    with:
+      full: true
+    secrets: inherit
+
+  release:
+    needs: ci
+    uses: boshold/gh-actions/.github/workflows/release-image.yml@main
+    permissions:
+      contents: write
+      packages: write
+    with:
+      bump: ${{ inputs.bump }}
+      dry-run: ${{ inputs.dry-run }}
+    secrets:
+      packages-token: ${{ secrets.PACKAGES_READ_TOKEN }}

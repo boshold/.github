@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [$default-branch]
+  pull_request:
+  workflow_call:
+    inputs:
+      full:
+        type: boolean
+        default: false
+        description: Also run the suites that are too slow for every pull request
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  ci:
+    uses: boshold/gh-actions/.github/workflows/nuxt-ci.yml@main
+    with:
+      test-command: ${{ inputs.full && 'pnpm test:full' || 'pnpm test' }}
+    secrets:
+      packages-token: ${{ secrets.PACKAGES_READ_TOKEN }}
