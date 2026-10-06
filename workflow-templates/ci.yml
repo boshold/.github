@@ -46,7 +46,7 @@ jobs:
     if: >-
       inputs.stage || (github.event.action != 'labeled' && github.event.action != 'unlabeled')
       || github.event.label.name == 'ci:full' || github.event.label.name == 'migration:destructive'
-    uses: boshold/gh-actions-public/.github/workflows/nuxt-ci.yml@49ed64a1c72fb2081bcaa2c584dbaa2c47e838a3 # v1.0.0
+    uses: boshold/gh-actions/.github/workflows/nuxt-ci.yml@49ed64a1c72fb2081bcaa2c584dbaa2c47e838a3 # v1.0.0
     with:
       stage: ${{ inputs.stage || (contains(github.event.pull_request.labels.*.name, 'ci:full') && 'full') || (github.event_name == 'workflow_dispatch' && 'full') || 'fast' }}
       postgres-version: "18"

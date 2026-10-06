@@ -1,6 +1,6 @@
 {
   "name": "boshold release (npm)",
-  "description": "Manual release: release-stage CI, version bump commit and tag, publish to GitHub Packages, GitHub release. Needs a ci.yml that accepts a stage input (see templates/ in boshold/gh-actions-public).",
+  "description": "Manual release: release-stage CI, version bump commit and tag, publish to GitHub Packages, GitHub release. Needs a ci.yml that accepts a stage input (see templates/ in boshold/gh-actions).",
   "iconName": "octicon package",
   "categories": ["TypeScript"],
   "filePatterns": ["package.json$"]
