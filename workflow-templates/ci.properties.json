@@ -1,7 +1,7 @@
 {
-  "name": "boshold CI",
-  "description": "Shared Nuxt CI from boshold/gh-actions. A release calls it with full: true.",
+  "name": "boshold CI (Nuxt app)",
+  "description": "Shared Nuxt app CI from boshold/gh-actions-public: fast stage on pull requests, full stage with the ci:full label. The release templates call it with stage release.",
   "iconName": "octicon check-circle",
   "categories": ["TypeScript"],
-  "filePatterns": ["package.json$"]
+  "filePatterns": ["nuxt.config.ts$"]
 }
