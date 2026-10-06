@@ -1,12 +1,14 @@
 name: Release
 
+# Release CI, then version commit + tag, GitHub release and GitHub Packages publish.
+
 on:
   workflow_dispatch:
     inputs:
       bump:
         description: Version part to raise
         type: choice
-        options: [patch, minor, major]
+        options: [patch, minor, major, prerelease, prepatch, preminor, premajor]
         default: patch
       dry-run:
         description: Test and build, but push, publish and release nothing
@@ -19,18 +21,22 @@ concurrency:
 
 permissions:
   contents: read
-  packages: read
 
 jobs:
   ci:
-    uses: ./.github/workflows/ci.yml
+    uses: $/.github/workflows/ci.yml
+    permissions:
+      contents: read
+      packages: read
+      pull-requests: write
     with:
-      full: true
-    secrets: inherit
+      stage: release
+    secrets:
+      PACKAGES_READ_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN }}
 
   release:
     needs: ci
-    uses: boshold/gh-actions/.github/workflows/release-npm.yml@main
+    uses: boshold/gh-actions-public/.github/workflows/release-npm.yml@49ed64a1c72fb2081bcaa2c584dbaa2c47e838a3 # v1.0.0
     permissions:
       contents: write
       packages: write
@@ -39,3 +45,4 @@ jobs:
       dry-run: ${{ inputs.dry-run }}
     secrets:
       packages-token: ${{ secrets.PACKAGES_READ_TOKEN }}
+      # release-token: ${{ secrets.RELEASE_TOKEN }}  # GitHub App token for protected branches

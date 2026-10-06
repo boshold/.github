@@ -1,6 +1,6 @@
 {
   "name": "boshold release (image)",
-  "description": "Manual release: full CI, version bump commit and tag, image build, smoke test and scan, ghcr version tags, GitHub release. Needs the boshold CI workflow as ci.yml.",
+  "description": "Manual release: release-stage CI, version bump commit and tag, image build, smoke test and scan, ghcr version tags, GitHub release, Dokploy production deploy (remove the production job if unused). Needs the boshold CI workflow as ci.yml.",
   "iconName": "octicon container",
   "categories": ["Dockerfile"],
   "filePatterns": ["Dockerfile$"]

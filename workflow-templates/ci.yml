@@ -1,28 +1,85 @@
 name: CI
 
+# Nuxt app CI. Pull requests run the fast stage (lint, typecheck, unit, image build+smoke); label
+# a PR "ci:full" for the full stage. deploy-stage.yml runs this on main (full + image push),
+# release.yml with stage release.
+
 on:
-  push:
-    branches: [$default-branch]
   pull_request:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+  workflow_dispatch:
   workflow_call:
     inputs:
-      full:
+      stage:
+        type: string
+        default: full
+      image-push:
         type: boolean
         default: false
-        description: Also run the suites that are too slow for every pull request
+      image-tags:
+        type: string
+        default: ""
+    secrets:
+      # Same name as the repository secret, so direct runs and calls read it the same way.
+      PACKAGES_READ_TOKEN:
+        required: false
+    outputs:
+      image:
+        description: Pushed image pinned by digest
+        value: ${{ jobs.ci.outputs.image }}
 
+# github.workflow is the caller's name under workflow_call, so a deploy and a PR never cancel each other.
+# Other label events get their own group: they skip every job and must not cancel a running CI.
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.ref }}${{ contains(fromJSON('["labeled","unlabeled"]'), github.event.action) && !contains(fromJSON('["ci:full","migration:destructive"]'), github.event.label.name) && format('-{0}', github.run_id) || '' }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
+# packages: write only matters when a deploy workflow calls this with image-push.
 permissions:
   contents: read
-  packages: read
+  packages: write
+  pull-requests: write
 
 jobs:
   ci:
-    uses: boshold/gh-actions/.github/workflows/nuxt-ci.yml@main
+    # Label events re-run CI only for ci:full or migration:destructive (prisma check); calls (inputs.stage set) always run.
+    if: >-
+      inputs.stage || (github.event.action != 'labeled' && github.event.action != 'unlabeled')
+      || github.event.label.name == 'ci:full' || github.event.label.name == 'migration:destructive'
+    uses: boshold/gh-actions-public/.github/workflows/nuxt-ci.yml@49ed64a1c72fb2081bcaa2c584dbaa2c47e838a3 # v1.0.0
     with:
-      test-command: ${{ inputs.full && 'pnpm test:full' || 'pnpm test' }}
+      stage: ${{ inputs.stage || (contains(github.event.pull_request.labels.*.name, 'ci:full') && 'full') || (github.event_name == 'workflow_dispatch' && 'full') || 'fast' }}
+      postgres-version: "18"
+      mailpit-version: v1.30
+      prepare-command: pnpm exec prisma generate
+      migrate-command: pnpm exec prisma migrate deploy
+      prisma-check: standard
+      seed-command: pnpm db:seed
+      test-command: pnpm test
+      e2e-command: pnpm test:e2e
+      playwright: true
+      coverage-report: true
+      image-build: true
+      image-on-fast: true
+      image-push: ${{ inputs.image-push == true }}
+      image-tags: ${{ inputs.image-tags }}
+      failure-artifact-path: test-results
+      env: |
+        APP_BASE_URL=http://localhost:3000
+        AUTH_SECRET=ci-only-secret-0000000000000000000000
+        DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres
+        DEPLOYMENT_ENVIRONMENT=stage
+        SMTP_HOST=localhost
+        SMTP_PORT=1025
+        SMTP_FROM=app@ci.invalid
+      # Slow or special suites, by stage. See the README for every key.
+      # extra-tests: |
+      #   [{"name": "gateway-e2e", "stage": "full", "services": true, "hosts": ["app.localhost"],
+      #     "setup": "pnpm exec prisma migrate deploy && pnpm build",
+      #     "background": ["node .output/server/index.mjs"], "wait-url": "http://127.0.0.1:3000/api/health",
+      #     "command": "pnpm test:gateway", "playwright": true, "artifacts": ["test-results"]}]
     secrets:
       packages-token: ${{ secrets.PACKAGES_READ_TOKEN }}
+      # Masked KEY=VALUE lines, exported like env:
+      # env-secrets: |
+      #   SOME_API_KEY=${{ secrets.SOME_API_KEY }}
