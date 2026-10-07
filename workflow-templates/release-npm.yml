@@ -36,7 +36,7 @@ jobs:
 
   release:
     needs: ci
-    uses: boshold/gh-actions/.github/workflows/release-npm.yml@90865cd82af9217fe08b786fe8855b444639bbf7 # v1.0.1
+    uses: boshold/gh-actions/.github/workflows/release-npm.yml@6efd184ea123c8b03f90c639f0a3ffe155929416 # v1.0.2
     permissions:
       contents: write
       packages: write
